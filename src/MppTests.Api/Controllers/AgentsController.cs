@@ -24,15 +24,14 @@ namespace MppTests.Api.Controllers
         {
             _logger.LogInformation("call test");
             var res = await _aiClient.GetTextResponseAsync("напиши четырехстишье про природу", "ты профессиональный писатель");
-            return "777";
+            return res;
         }
 
         [HttpGet("test2")]
-        public async Task<string> Test2()
+        public string Test2()
         {
-            _logger.LogInformation("call test2");
-            var res = await _aiClient.GetTextResponseAsync("напиши четырехстишье про природу", "ты профессиональный писатель");
-            return res;
+            _logger.LogInformation("call test2");            
+            return "1477";
         }
     }
 }
