@@ -1,0 +1,28 @@
+services:
+  mpp_tests_api:
+    container_name: mpp-tests-api-container
+    build:
+      context: ..
+      dockerfile: src/MppTests.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Prod
+      - SmtpConfig__Username=${SMTP_USERNAME}
+      - SmtpConfig__Password=${SMTP_PASSWORD}
+      - GoogleRecaptcha__SecretKeyForOxfordAp=${RECAPTCHA_OXFORD_SECRET}
+      - GoogleRecaptcha__SecretKeyForYashelCenter=${RECAPTCHA_YASHEL_SECRET}
+      - GoogleRecaptcha__SecretKeyForPingmetasks=${RECAPTCHA_PINGME_SECRET}
+    restart: unless-stopped    
+    networks:
+      - public-network
+    labels:      
+      - "traefik.enable=true"      
+      - "traefik.http.routers.mpp-tests-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/mpp-tests`)"      
+      - "traefik.http.routers.mpp-tests-api.entrypoints=websecure"      
+      - "traefik.http.routers.mpp-tests-api.tls.certresolver=letsencrypt"     
+      - "traefik.http.services.mpp-tests-api.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.mpp-tests-stripprefix.stripprefix.prefixes=/mpp-tests"
+      - "traefik.http.routers.mpp-tests-api.middlewares=mpp-tests-stripprefix"
+
+networks:
+  public-network:
+    external: true
