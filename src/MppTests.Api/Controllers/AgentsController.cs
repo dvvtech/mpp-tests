@@ -4,7 +4,7 @@ using MppTests.Api.BLL.Abstract;
 
 namespace MppTests.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("agents")]
     [ApiController]
     public class AgentsController : ControllerBase
     {
