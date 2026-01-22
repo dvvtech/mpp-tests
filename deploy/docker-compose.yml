@@ -6,11 +6,12 @@ services:
       dockerfile: src/MppTests.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Prod
-      - SmtpConfig__Username=${SMTP_USERNAME}
-      - SmtpConfig__Password=${SMTP_PASSWORD}
-      - GoogleRecaptcha__SecretKeyForOxfordAp=${RECAPTCHA_OXFORD_SECRET}
-      - GoogleRecaptcha__SecretKeyForYashelCenter=${RECAPTCHA_YASHEL_SECRET}
-      - GoogleRecaptcha__SecretKeyForPingmetasks=${RECAPTCHA_PINGME_SECRET}
+      - AiClientConfig__OpenAiApiKey=${OPEN_AI_API_KEY}
+      - ProxySettings__Ip=${IP_KEY}
+      - ProxySettings__Port=${PORT_KEY}
+      - ProxySettings__Login=${LOGIN_KEY}
+      - ProxySettings__Password=${PASSWORD_KEY}
+      
     restart: unless-stopped    
     networks:
       - public-network
