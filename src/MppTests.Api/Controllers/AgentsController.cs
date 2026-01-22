@@ -20,10 +20,11 @@ namespace MppTests.Api.Controllers
         }
 
         [HttpGet("test")]
-        public string Test()
+        public async Task<string> Test()
         {
             _logger.LogInformation("call test");
-            return "555";
+            var res = await _aiClient.GetTextResponseAsync("напиши четырехстишье про природу", "ты профессиональный писатель");
+            return "777";
         }
 
         [HttpGet("test2")]
