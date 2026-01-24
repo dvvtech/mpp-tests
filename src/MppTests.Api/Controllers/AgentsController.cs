@@ -19,14 +19,6 @@ namespace MppTests.Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet("generate")]
-        public async Task<string> GenerateAnswer()
-        {
-            _logger.LogInformation("call test");
-            var res = await _aiClient.GetTextResponseAsync("напиши четырехстишье про природу", "ты профессиональный писатель");
-            return res;
-        }
-
         [HttpGet("test")]
         public async Task<string> Test()
         {

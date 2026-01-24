@@ -58,10 +58,16 @@ namespace MppTests.Api.BLL.Services
 
             //var jsonContent = JsonSerializer.Serialize(prompt);
             //var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            var jsonContent = JsonSerializer.Serialize(prompt.ColorData);
+            var options = new JsonSerializerOptions
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                //WriteIndented = false
+            };
+            var jsonContent = JsonSerializer.Serialize(prompt.ColorData, options);
+            
             //var response = await _httpClient.PostAsync("llm-api-endpoint", content);
-            var responseJson = await _aiClient.GetTextResponseAsync(prompt.SystemPrompt, jsonContent);
+            var responseJson = await _aiClient.GetTextResponseAsync(jsonContent, prompt.SystemPrompt);
             //response.EnsureSuccessStatusCode();
 
             //var responseJson = await response.Content.ReadAsStringAsync();
