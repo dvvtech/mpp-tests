@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35806.99 d17.13
+VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{44999F5E-9DD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MppTests.Api", "src\MppTests.Api\MppTests.Api.csproj", "{AC94CD94-2D71-4F28-AE17-B6A4FEA5F3DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MppTests.Models", "src\MppTests.Models\MppTests.Models.csproj", "{63F694D5-EA3D-486D-B4A8-53BF05A56CDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +25,17 @@ Global
 		{AC94CD94-2D71-4F28-AE17-B6A4FEA5F3DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC94CD94-2D71-4F28-AE17-B6A4FEA5F3DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC94CD94-2D71-4F28-AE17-B6A4FEA5F3DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63F694D5-EA3D-486D-B4A8-53BF05A56CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63F694D5-EA3D-486D-B4A8-53BF05A56CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63F694D5-EA3D-486D-B4A8-53BF05A56CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63F694D5-EA3D-486D-B4A8-53BF05A56CDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AC94CD94-2D71-4F28-AE17-B6A4FEA5F3DC} = {44999F5E-9DD4-474F-9DF8-576213611CD1}
+		{63F694D5-EA3D-486D-B4A8-53BF05A56CDB} = {44999F5E-9DD4-474F-9DF8-576213611CD1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00B7ED18-83EF-4821-AA37-18C707F7B850}
