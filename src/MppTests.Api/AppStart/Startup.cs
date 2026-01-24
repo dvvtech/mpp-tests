@@ -35,6 +35,8 @@ namespace MppTests.Api.AppStart
 
         private void ConfigureClientAPI()
         {
+            _builder.Services.AddScoped<IColorPsychologyService, ColorPsychologyService>();
+
             _builder.Services.AddHttpClient<IAiClient, ChatGptAiClient>((serviceProvider, client) =>
             {
                 var aiClientConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();

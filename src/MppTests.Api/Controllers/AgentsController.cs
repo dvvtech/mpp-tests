@@ -4,7 +4,7 @@ using MppTests.Api.BLL.Abstract;
 
 namespace MppTests.Api.Controllers
 {
-    [Route("agents")]
+    [Route("v1/agents")]
     [ApiController]
     public class AgentsController : ControllerBase
     {
@@ -17,6 +17,14 @@ namespace MppTests.Api.Controllers
         {
             _aiClient = aiClient;
             _logger = logger;
+        }
+
+        [HttpGet("generate")]
+        public async Task<string> GenerateAnswer()
+        {
+            _logger.LogInformation("call test");
+            var res = await _aiClient.GetTextResponseAsync("напиши четырехстишье про природу", "ты профессиональный писатель");
+            return res;
         }
 
         [HttpGet("test")]
