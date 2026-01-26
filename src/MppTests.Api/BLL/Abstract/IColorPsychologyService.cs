@@ -5,6 +5,6 @@ namespace MppTests.Api.BLL.Abstract
 {
     public interface IColorPsychologyService
     {
-        Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(ColorDataRequest request);
+        Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(ColorDataRequest request, CancellationToken cancellationToken = default);
     }
 }

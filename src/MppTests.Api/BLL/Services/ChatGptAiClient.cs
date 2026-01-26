@@ -22,14 +22,18 @@ namespace MppTests.Api.BLL.Services
         }
 
         // Метод для текстовых запросов
-        public async Task<string> GetTextResponseAsync(string prompt, string systemPrompt)
+        public async Task<string> GetTextResponseAsync(
+            string userPrompt,
+            string systemPrompt,
+            CancellationToken cancellationToken = default)
         {
             return await GetResponseInternalAsync(
                 messages: new[]
                 {
                     new { role = "system", content = systemPrompt },
-                    new { role = "user", content = prompt }
-                }
+                    new { role = "user", content = userPrompt }
+                },
+                cancellationToken
             );
         }
 
@@ -78,7 +82,7 @@ namespace MppTests.Api.BLL.Services
         }
 
         // Общий внутренний метод для отправки запроса
-        private async Task<string> GetResponseInternalAsync(object[] messages)
+        private async Task<string> GetResponseInternalAsync(object[] messages, CancellationToken cancellationToken = default)
         {
             var requestBody = new
             {
@@ -89,7 +93,7 @@ namespace MppTests.Api.BLL.Services
 
             var jsonRequestBody = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(_apiUrl, content);
+            var response = await _httpClient.PostAsync(_apiUrl, content, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

@@ -2,6 +2,7 @@
 using MppTests.Api.BLL.Abstract;
 using MppTests.Api.Models;
 using MppTests.Models;
+using System.Reflection;
 using System.Text.Json;
 
 namespace MppTests.Api.BLL.Services
@@ -11,67 +12,97 @@ namespace MppTests.Api.BLL.Services
         private readonly IAiClient _aiClient;
         private readonly ILogger<ColorPsychologyService> _logger;
 
+        private const string PromptResourceName = "MppTests.Api.BLL.Prompts.ColorPsychologyPrompt.txt";
+
+        private static readonly Lazy<string> SystemPromptLazy = new Lazy<string>(() =>
+            LoadPromptFromResources());
+
+        private static string SystemPrompt => SystemPromptLazy.Value;
+
+        private const string UserPromptTemplate = """
+Ниже приведены данные о цветовых предпочтениях пользователя.
+Проценты показывают долю каждого цвета и суммарно составляют ~100%.
+
+Цвета могут указаны на русском языке.
+
+ДАННЫЕ:
+{0}
+""";
+
+        private static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+        private static readonly JsonSerializerOptions DeserializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         public ColorPsychologyService(IAiClient aiClient, ILogger<ColorPsychologyService> logger)
         {
             _aiClient = aiClient;
             _logger = logger;
         }
 
-        public async Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(ColorDataRequest request)
+        public async Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(
+            ColorDataRequest request,
+            CancellationToken cancellationToken = default)
         {
             var prompt = new PsychologyPrompt
             {
                 ColorData = request,
-                SystemPrompt = @"Ты — опытный психолог, специализирующийся на проективной диагностике и анализе цветовых предпочтений по адаптированной методике Люшера. 
-                          Твоя задача — проанализировать раскраску пользователя и дать развёрнутую психологическую интерпретацию.
-                          
-                          МЕТОДИКА АНАЛИЗА:
-                          1. ПРЕОБЛАДАНИЕ КРАСНОГО (>30%): Энергичность, активность, лидерские качества
-                          2. ПРЕОБЛАДАНИЕ СИНЕГО (>25%): Спокойствие, рассудительность, стабильность
-                          3. ПРЕОБЛАДАНИЕ ЗЕЛЕНОГО (>20%): Баланс, гармония, естественность
-                          4. ПРЕОБЛАДАНИЕ ЖЕЛТОГО (>15%): Оптимизм, креативность, общительность
-                          5. ПРЕОБЛАДАНИЕ ФИОЛЕТОВОГО (>10%): Интуиция, духовность, чувствительность
-                          6. ПРЕОБЛАДАНИЕ ЧЕРНОГО (>5%): Сдержанность, таинственность, депрессивные тенденции
-                          7. РАВНОМЕРНОЕ РАСПРЕДЕЛЕНИЕ (все цвета 10-20%): Гармоничная личность, адаптивность
-                          
-                          ДОПОЛНИТЕЛЬНЫЕ ПРАВИЛА:
-                          - Если один цвет >50% - указывать на возможную одержимость/фиксацию
-                          - Если использовано менее 3 цветов - отметить ограниченность восприятия
-                          - Сочетание теплых цветов (красный, желтый) - экстраверсия
-                          - Сочетание холодных (синий, зеленый) - интроверсия
-                          
-                          ФОРМАТ ОТВЕТА:
-                          1. Основная характеристика
-                          2. Сильные стороны
-                          3. Рекомендации"
+                SystemPrompt = SystemPrompt
             };
 
-            var analysis = await SendToLlmAsync(prompt);
-
-            return analysis;            
+            return await SendToLlmAsync(prompt);                      
         }
 
-        private async Task<PsychologicalAnalysisResponse> SendToLlmAsync(PsychologyPrompt prompt)
-        {
-            // Здесь код отправки в выбранную LLM API
-            // Например: OpenAI GPT, Yandex GPT, etc.
+        private async Task<PsychologicalAnalysisResponse> SendToLlmAsync(
+            PsychologyPrompt prompt,
+            CancellationToken cancellationToken = default)
+        {                        
+            var colorsJson = JsonSerializer.Serialize(prompt.ColorData, SerializerOptions);
+            var userPrompt = string.Format(UserPromptTemplate, colorsJson);
 
-            //var jsonContent = JsonSerializer.Serialize(prompt);
-            //var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            var options = new JsonSerializerOptions
+            var responseJson = await _aiClient.GetTextResponseAsync(
+                userPrompt,
+                prompt.SystemPrompt,
+                cancellationToken);
+
+            try
             {
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                //WriteIndented = false
-            };
-            var jsonContent = JsonSerializer.Serialize(prompt.ColorData, options);
-            
-            //var response = await _httpClient.PostAsync("llm-api-endpoint", content);
-            var responseJson = await _aiClient.GetTextResponseAsync(jsonContent, prompt.SystemPrompt);
-            //response.EnsureSuccessStatusCode();
+                return JsonSerializer.Deserialize<PsychologicalAnalysisResponse>(
+                    responseJson,
+                    DeserializerOptions
+                );
+            }
+            catch (JsonException ex)
+            {
+                //более правильно наверху залогировать
+                _logger.LogError(ex, "LLM вернула некорректный JSON. Response: {Response}", responseJson);
+                throw new InvalidOperationException("LLM вернула некорректный JSON", ex);
+            }
+        }
 
-            //var responseJson = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<PsychologicalAnalysisResponse>(responseJson);
+        public static string LoadPromptFromResources()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+#if DEBUG
+            var resourceNames = assembly.GetManifestResourceNames();
+            if (!resourceNames.Contains(PromptResourceName))
+            {
+                var available = string.Join(", ", resourceNames);
+                throw new InvalidOperationException(
+                    $"Resource '{PromptResourceName}' not found. Available: {available}");
+            }
+#endif
+            using var stream = assembly.GetManifestResourceStream(PromptResourceName);
+            if (stream == null)
+                throw new InvalidOperationException($"Resource '{PromptResourceName}' not found");
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
         }
     }
 }

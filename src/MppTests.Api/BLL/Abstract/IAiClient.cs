@@ -2,6 +2,6 @@
 {
     public interface IAiClient
     {
-        Task<string> GetTextResponseAsync(string prompt, string systemPrompt);
+        Task<string> GetTextResponseAsync(string userPrompt, string systemPrompt, CancellationToken cancellationToken = default);
     }
 }
