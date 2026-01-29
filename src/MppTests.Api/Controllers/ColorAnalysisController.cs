@@ -5,6 +5,7 @@ using MppTests.Api.BLL.Exceptions;
 using MppTests.Api.Models;
 using MppTests.Models;
 using System.Text.Json;
+using System.Threading;
 
 namespace MppTests.Api.Controllers
 {
@@ -25,7 +26,8 @@ namespace MppTests.Api.Controllers
 
         [HttpPost("analyze-lusher")]
         public async Task<ActionResult<PsychologicalAnalysisResponse>> AnalyzeByLusherMethod(
-        [FromBody] ColorDataRequest request)
+            [FromBody] ColorDataRequest request,
+            CancellationToken cancellationToken = default)
         {
 
             try
@@ -93,17 +95,22 @@ namespace MppTests.Api.Controllers
                     Status = statusCode
                 });
             }
-            catch (ExternalServiceException ex) when (ex.InnerException is TaskCanceledException)
-            {
-                _logger.LogError(ex, "AI service timeout or operation canceled");
-
-                return StatusCode(StatusCodes.Status504GatewayTimeout, new ProblemDetails
-                {
-                    Title = "AI Service Timeout or operation canceled",
-                    Detail = "The AI service did not respond in time",
-                    Status = StatusCodes.Status504GatewayTimeout
-                });
+            catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
+            {                
+                _logger.LogInformation("Client cancelled the request");
+                return StatusCode(499); // Client Closed Request
             }
+            //catch (ExternalServiceException ex) when (ex.InnerException is TaskCanceledException)
+            //{
+            //    _logger.LogError(ex, "AI service timeout or operation canceled");
+
+            //    return StatusCode(StatusCodes.Status504GatewayTimeout, new ProblemDetails
+            //    {
+            //        Title = "AI Service Timeout or operation canceled",
+            //        Detail = "The AI service did not respond in time",
+            //        Status = StatusCodes.Status504GatewayTimeout
+            //    });
+            //}
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "External ai service error");

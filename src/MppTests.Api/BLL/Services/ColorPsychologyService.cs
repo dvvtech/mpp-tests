@@ -64,36 +64,35 @@ namespace MppTests.Api.BLL.Services
             var colorsJson = JsonSerializer.Serialize(prompt.ColorData, SerializerOptions);
             var userPrompt = string.Format(UserPromptTemplate, colorsJson);
 
-            string responseJson;
+            string responseJson = string.Empty;
             try
             {
                 responseJson = await _aiClient.GetTextResponseAsync(
                     userPrompt,
                     prompt.SystemPrompt,
                     cancellationToken);
+
+                return JsonSerializer.Deserialize<PsychologicalAnalysisResponse>(
+                    responseJson,
+                    DeserializerOptions);
             }
             catch (HttpRequestException ex)
             {
                 throw new ExternalServiceException("AI Client", $"AI service request failed", ex);
             }
             catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
-            {
+            {             
                 throw new ExternalServiceException("AI Client", "AI service timeout", ex);
             }
-
-            try
+            catch (TaskCanceledException ex) when (cancellationToken.IsCancellationRequested)
             {
-                return JsonSerializer.Deserialize<PsychologicalAnalysisResponse>(
-                    responseJson,
-                    DeserializerOptions
-                );
+                // Если клиент отменил - пробрасываем как есть
+                throw;
             }
             catch (JsonException ex)
-            {
-                //более правильно наверху залогировать
-                //_logger.LogError(ex, "LLM вернула некорректный JSON. Response: {Response}", responseJson);
+            {                
                 throw new LlmInvalidResponseException(responseJson, ex);
-            }
+            }            
         }
 
         public static string LoadPromptFromResources()
