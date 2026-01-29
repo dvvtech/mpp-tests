@@ -1,5 +1,6 @@
 ﻿
 using MppTests.Api.BLL.Abstract;
+using MppTests.Api.BLL.Exceptions;
 using MppTests.Api.Models;
 using MppTests.Models;
 using System.Reflection;
@@ -9,8 +10,7 @@ namespace MppTests.Api.BLL.Services
 {
     public class ColorPsychologyService : IColorPsychologyService
     {
-        private readonly IAiClient _aiClient;
-        private readonly ILogger<ColorPsychologyService> _logger;
+        private readonly IAiClient _aiClient;        
 
         private const string PromptResourceName = "MppTests.Api.BLL.Prompts.ColorPsychologyPrompt.txt";
 
@@ -39,10 +39,9 @@ namespace MppTests.Api.BLL.Services
             PropertyNameCaseInsensitive = true
         };
 
-        public ColorPsychologyService(IAiClient aiClient, ILogger<ColorPsychologyService> logger)
+        public ColorPsychologyService(IAiClient aiClient)
         {
-            _aiClient = aiClient;
-            _logger = logger;
+            _aiClient = aiClient;            
         }
 
         public async Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(
@@ -65,10 +64,22 @@ namespace MppTests.Api.BLL.Services
             var colorsJson = JsonSerializer.Serialize(prompt.ColorData, SerializerOptions);
             var userPrompt = string.Format(UserPromptTemplate, colorsJson);
 
-            var responseJson = await _aiClient.GetTextResponseAsync(
-                userPrompt,
-                prompt.SystemPrompt,
-                cancellationToken);
+            string responseJson;
+            try
+            {
+                responseJson = await _aiClient.GetTextResponseAsync(
+                    userPrompt,
+                    prompt.SystemPrompt,
+                    cancellationToken);
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new ExternalServiceException("AI Client", $"AI service request failed", ex);
+            }
+            catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
+            {
+                throw new ExternalServiceException("AI Client", "AI service timeout", ex);
+            }
 
             try
             {
@@ -80,8 +91,8 @@ namespace MppTests.Api.BLL.Services
             catch (JsonException ex)
             {
                 //более правильно наверху залогировать
-                _logger.LogError(ex, "LLM вернула некорректный JSON. Response: {Response}", responseJson);
-                throw new InvalidOperationException("LLM вернула некорректный JSON", ex);
+                //_logger.LogError(ex, "LLM вернула некорректный JSON. Response: {Response}", responseJson);
+                throw new LlmInvalidResponseException(responseJson, ex);
             }
         }
 
@@ -92,15 +103,14 @@ namespace MppTests.Api.BLL.Services
 #if DEBUG
             var resourceNames = assembly.GetManifestResourceNames();
             if (!resourceNames.Contains(PromptResourceName))
-            {
-                var available = string.Join(", ", resourceNames);
-                throw new InvalidOperationException(
-                    $"Resource '{PromptResourceName}' not found. Available: {available}");
+            {                
+                throw new ResourceNotFoundException(PromptResourceName);
             }
 #endif
             using var stream = assembly.GetManifestResourceStream(PromptResourceName);
             if (stream == null)
-                throw new InvalidOperationException($"Resource '{PromptResourceName}' not found");
+                throw new ResourceNotFoundException(PromptResourceName);
+
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
