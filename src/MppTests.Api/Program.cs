@@ -1,4 +1,5 @@
 using MppTests.Api.AppStart;
+using MppTests.Api.AppStart.Extensions;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,10 @@ if (builder.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.ApplyCors();
 }
 
 app.UseHttpsRedirection();

@@ -1,4 +1,5 @@
-﻿using MppTests.Api.BLL.Abstract;
+﻿using MppTests.Api.AppStart.Extensions;
+using MppTests.Api.BLL.Abstract;
 using MppTests.Api.BLL.Services;
 using MppTests.Api.Configuration;
 using System.Net;
@@ -19,6 +20,10 @@ namespace MppTests.Api.AppStart
             if (_builder.Environment.IsDevelopment())
             {
                 _builder.Services.AddSwaggerGen();
+            }
+            else
+            {
+                _builder.Services.ConfigureCors();
             }
 
             InitConfigs();
