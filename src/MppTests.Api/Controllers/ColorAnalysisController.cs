@@ -29,6 +29,7 @@ namespace MppTests.Api.Controllers
             [FromBody] ColorDataRequest request,
             CancellationToken cancellationToken = default)
         {
+            _logger.LogInformation($"{DateTime.Now.ToString()} analize test");
 
             try
             {
