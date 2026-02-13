@@ -25,7 +25,6 @@
                           .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
                           .AllowAnyHeader(); // Разрешить любые заголовки
                 });
-
             });
         }
 

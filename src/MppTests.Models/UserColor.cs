@@ -5,7 +5,7 @@ namespace MppTests.Models
 {
     public class ApiRequest
     {
-        [JsonPropertyName("userData")]
+        [JsonPropertyName("user_data")]
         public UserColor UserData { get; set; }
 
         [JsonPropertyName("version")]
@@ -23,7 +23,7 @@ namespace MppTests.Models
         [JsonPropertyName("gender")]
         public string Gender { get; set; }
 
-        [JsonPropertyName("zodiacSign")]
+        [JsonPropertyName("zodiac_sign")]
         public string ZodiacSign { get; set; }
     }
 
