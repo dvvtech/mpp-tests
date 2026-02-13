@@ -5,7 +5,6 @@ using MppTests.Api.BLL.Exceptions;
 using MppTests.Api.Models;
 using MppTests.Models;
 using System.Text.Json;
-using System.Threading;
 
 namespace MppTests.Api.Controllers
 {
@@ -26,7 +25,7 @@ namespace MppTests.Api.Controllers
 
         [HttpPost("analyze-lusher")]
         public async Task<ActionResult<PsychologicalAnalysisResponse>> AnalyzeByLusherMethod(
-            [FromBody] ColorDataRequest request,
+            [FromBody] ApiRequest request,
             CancellationToken cancellationToken = default)
         {
             _logger.LogInformation($"{DateTime.Now.ToString()} analize test");

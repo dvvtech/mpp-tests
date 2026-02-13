@@ -45,14 +45,25 @@ namespace MppTests.Api.BLL.Services
         }
 
         public async Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(
-            ColorDataRequest request,
+            ApiRequest request,
             CancellationToken cancellationToken = default)
         {
-            var prompt = new PsychologyPrompt
+            var prompt = new PsychologyPrompt()
             {
-                ColorData = request,
-                SystemPrompt = SystemPrompt
+                UserColor = request.UserData
             };
+            if (request.Version == 1)
+            {
+                prompt.SystemPrompt = SystemPrompt;
+            }
+            else if (request.Version == 2)
+            {
+                //prompt.SystemPrompt = SystemPromptV2;
+            }
+            else
+            {
+                throw new Exception("not found version");
+            }
 
             return await SendToLlmAsync(prompt);                      
         }
@@ -61,8 +72,8 @@ namespace MppTests.Api.BLL.Services
             PsychologyPrompt prompt,
             CancellationToken cancellationToken = default)
         {                        
-            var colorsJson = JsonSerializer.Serialize(prompt.ColorData, SerializerOptions);
-            var userPrompt = string.Format(UserPromptTemplate, colorsJson);
+            var userColorJson = JsonSerializer.Serialize(prompt.UserColor, SerializerOptions);
+            var userPrompt = string.Format(UserPromptTemplate, userColorJson);
 
             string responseJson = string.Empty;
             try
@@ -99,13 +110,6 @@ namespace MppTests.Api.BLL.Services
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-#if DEBUG
-            var resourceNames = assembly.GetManifestResourceNames();
-            if (!resourceNames.Contains(PromptResourceName))
-            {                
-                throw new ResourceNotFoundException(PromptResourceName);
-            }
-#endif
             using var stream = assembly.GetManifestResourceStream(PromptResourceName);
             if (stream == null)
                 throw new ResourceNotFoundException(PromptResourceName);

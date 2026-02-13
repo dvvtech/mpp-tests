@@ -11,7 +11,7 @@ namespace MppTests.Client
             _httpClient = httpClient;
         }
 
-        public async Task GenerateAnswer(ColorDataRequest colorDataRequest)
+        public async Task GenerateAnswer(UserColor colorDataRequest)
         {
             //v1/agents
         }

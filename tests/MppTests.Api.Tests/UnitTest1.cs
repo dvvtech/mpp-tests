@@ -8,7 +8,7 @@ namespace MppTests.Api.Tests
         [Fact]
         public void Test1()
         {
-            var colorDataRequest = new ColorDataRequest
+            var colorDataRequest = new UserColor
             {
                 Colors = new List<ColorItem> 
                 {
