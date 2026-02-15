@@ -5,8 +5,8 @@ namespace MppTests.Models
 {
     public class ApiRequest
     {
-        [JsonPropertyName("user_data")]
-        public UserColor UserData { get; set; }
+        [JsonPropertyName("user_color")]
+        public UserColor UserColor { get; set; }
 
         [JsonPropertyName("version")]
         public int Version { get; set; }

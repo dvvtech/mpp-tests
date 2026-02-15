@@ -31,7 +31,7 @@ namespace MppTests.Api.Controllers
             _logger.LogInformation($"{DateTime.Now.ToString()} analize test");
 
             try
-            {
+            {                             
                 var analysis = await _psychologyService.AnalyzeColorPreferencesAsync(request);
                 return Ok(analysis);
             }

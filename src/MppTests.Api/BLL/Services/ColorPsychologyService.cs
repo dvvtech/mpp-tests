@@ -3,31 +3,14 @@ using MppTests.Api.BLL.Abstract;
 using MppTests.Api.BLL.Exceptions;
 using MppTests.Api.Models;
 using MppTests.Models;
-using System.Reflection;
 using System.Text.Json;
 
 namespace MppTests.Api.BLL.Services
 {
     public class ColorPsychologyService : IColorPsychologyService
     {
-        private readonly IAiClient _aiClient;        
-
-        private const string PromptResourceName = "MppTests.Api.BLL.Prompts.ColorPsychologyPrompt.txt";
-
-        private static readonly Lazy<string> SystemPromptLazy = new Lazy<string>(() =>
-            LoadPromptFromResources());
-
-        private static string SystemPrompt => SystemPromptLazy.Value;
-
-        private const string UserPromptTemplate = """
-Ниже приведены данные о цветовых предпочтениях пользователя.
-Проценты показывают долю каждого цвета и суммарно составляют ~100%.
-
-Цвета могут быть указаны на русском языке.
-
-ДАННЫЕ:
-{0}
-""";
+        private readonly IAiClient _aiClient;
+        private readonly IPromptService _promptService;
 
         private static readonly JsonSerializerOptions SerializerOptions = new()
         {
@@ -39,9 +22,10 @@ namespace MppTests.Api.BLL.Services
             PropertyNameCaseInsensitive = true
         };
 
-        public ColorPsychologyService(IAiClient aiClient)
+        public ColorPsychologyService(IAiClient aiClient, IPromptService promptService)
         {
-            _aiClient = aiClient;            
+            _aiClient = aiClient;
+            _promptService = promptService;
         }
 
         public async Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(
@@ -50,20 +34,11 @@ namespace MppTests.Api.BLL.Services
         {
             var prompt = new PsychologyPrompt()
             {
-                UserColor = request.UserData
+                UserColor = request.UserColor
             };
-            if (request.Version == 1)
-            {
-                prompt.SystemPrompt = SystemPrompt;
-            }
-            else if (request.Version == 2)
-            {
-                //prompt.SystemPrompt = SystemPromptV2;
-            }
-            else
-            {
-                throw new Exception("not found version");
-            }
+
+            prompt.SystemPrompt = _promptService.GetSystemPrompt(request.Version);
+            prompt.UserPrompt = _promptService.GetUserPrompt(request.Version);
 
             return await SendToLlmAsync(prompt);                      
         }
@@ -73,7 +48,7 @@ namespace MppTests.Api.BLL.Services
             CancellationToken cancellationToken = default)
         {                        
             var userColorJson = JsonSerializer.Serialize(prompt.UserColor, SerializerOptions);
-            var userPrompt = string.Format(UserPromptTemplate, userColorJson);
+            var userPrompt = string.Format(prompt.UserPrompt, userColorJson);
 
             string responseJson = string.Empty;
             try
@@ -104,18 +79,6 @@ namespace MppTests.Api.BLL.Services
             {                
                 throw new LlmInvalidResponseException(responseJson, ex);
             }            
-        }
-
-        public static string LoadPromptFromResources()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            using var stream = assembly.GetManifestResourceStream(PromptResourceName);
-            if (stream == null)
-                throw new ResourceNotFoundException(PromptResourceName);
-
-            using var reader = new StreamReader(stream);
-            return reader.ReadToEnd();
-        }
+        }        
     }
 }
