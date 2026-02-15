@@ -7,11 +7,17 @@ namespace MppTests.Api.BLL.Services
     public class PromptService : IPromptService
     {
         private const string PromptResourceName = "MppTests.Api.BLL.Prompts.ColorPsychologyPrompt.txt";
+        private const string PromptResourceNameV2 = "MppTests.Api.BLL.Prompts.ColorPsychologyPromptV2.txt";
 
         private static readonly Lazy<string> SystemPromptLazy = new Lazy<string>(() =>
-            LoadPromptFromResources());
+            LoadPromptFromResources(PromptResourceName));
+
+        private static readonly Lazy<string> SystemPromptLazyV2 = new Lazy<string>(() =>
+            LoadPromptFromResources(PromptResourceNameV2));
 
         private static string SystemPrompt => SystemPromptLazy.Value;
+
+        private static string SystemPromptV2 => SystemPromptLazyV2.Value;
 
         private const string UserPromptTemplate = """
 Ниже приведены данные о цветовых предпочтениях пользователя.
@@ -30,8 +36,8 @@ namespace MppTests.Api.BLL.Services
                 return SystemPrompt;
             }
             else if (version == 2)
-            { 
-            
+            {
+                return SystemPromptV2;
             }
 
             throw new Exception("not found version for system prompt");
@@ -47,13 +53,13 @@ namespace MppTests.Api.BLL.Services
             throw new Exception("not found version for user prompt");
         }
 
-        private static string LoadPromptFromResources()
+        private static string LoadPromptFromResources(string promptResourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-            using var stream = assembly.GetManifestResourceStream(PromptResourceName);
+            using var stream = assembly.GetManifestResourceStream(promptResourceName);
             if (stream == null)
-                throw new ResourceNotFoundException(PromptResourceName);
+                throw new ResourceNotFoundException(promptResourceName);
 
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();

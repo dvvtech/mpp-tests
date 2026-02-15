@@ -11,10 +11,12 @@
 
   <ItemGroup>
     <None Remove="BLL\Prompts\ColorPsychologyPrompt.txt" />
+    <None Remove="BLL\Prompts\ColorPsychologyPromptV2.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="BLL\Prompts\ColorPsychologyPrompt.txt" />
+    <EmbeddedResource Include="BLL\Prompts\ColorPsychologyPromptV2.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,10 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MppTests.Models\MppTests.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
