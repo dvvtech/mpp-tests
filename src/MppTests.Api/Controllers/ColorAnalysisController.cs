@@ -21,7 +21,7 @@ namespace MppTests.Api.Controllers
         {
             _psychologyService = psychologyService;
             _logger = logger;
-        }
+        }        
 
         [HttpPost("analyze-lusher")]
         public async Task<ActionResult<PsychologicalAnalysisResponse>> AnalyzeByLusherMethod(
@@ -154,6 +154,31 @@ namespace MppTests.Api.Controllers
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
+        }
+
+        [HttpPost("analyze-lusher-test")]
+        public ActionResult<PsychologicalAnalysisResponse> AnalyzeByLusherMethodTest(
+            [FromBody] ApiRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return Ok(new PsychologicalAnalysisResponse
+            {
+                MainCharacteristic = "Вас характеризует стремление к гармонии и стабильности, что проявляется в значительном предпочтении зеленого цвета. Это указывает на вашу потребность в признании и защите собственных границ. Оранжевый цвет подчеркивает вашу коммуникабельность и оптимизм в общении с окружающими, несмотря на возраст зрелости, когда часто происходит переоценка ценностей. Как Водолей, вы отличаетесь гибкостью и интеллектом, что помогает вам находить баланс между внутренним миром и социальной активностью.",
+                Strengths = new List<string>
+                {
+                    "Гармония и стабильность",
+                    "Коммуникабельность",
+                    "Интеллект и гибкость",
+                    "Гармония"
+                },
+                Recommendations = new List<string>
+                {
+                    "Сохраняйте баланс между внутренней гармонией и социальной активностью.",
+                    "Используйте свою коммуникабельность для установления полезных связей.",
+                    "Не забывайте о необходимости личного пространства, чтобы поддерживать внутреннюю стабильность.",
+                    "Продолжайте развивать свои интеллектуальные способности и гибкость мышления."
+                }
+            });
         }
     }
 }
