@@ -162,10 +162,12 @@ namespace MppTests.Api.Controllers
         }
 
         [HttpPost("analyze-lusher-test")]
-        public ActionResult<PsychologicalAnalysisResponse> AnalyzeByLusherMethodTest(
+        public async Task<ActionResult<PsychologicalAnalysisResponse>> AnalyzeByLusherMethodTest(
             [FromBody] ApiRequest request,
             CancellationToken cancellationToken = default)
         {
+            await Task.Delay(4000);
+
             return Ok(new PsychologicalAnalysisResponse
             {
                 MainCharacteristic = "Вас характеризует стремление к гармонии и стабильности, что проявляется в значительном предпочтении зеленого цвета. Это указывает на вашу потребность в признании и защите собственных границ. Оранжевый цвет подчеркивает вашу коммуникабельность и оптимизм в общении с окружающими, несмотря на возраст зрелости, когда часто происходит переоценка ценностей. Как Водолей, вы отличаетесь гибкостью и интеллектом, что помогает вам находить баланс между внутренним миром и социальной активностью.",
