@@ -14,12 +14,15 @@ namespace MppTests.Api.Controllers
     {
         private readonly IColorPsychologyService _psychologyService;
         private readonly ILogger<ColorAnalysisController> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public ColorAnalysisController(
             IColorPsychologyService psychologyService,
+            IHttpClientFactory httpClientFactory,
             ILogger<ColorAnalysisController> logger)
         {
             _psychologyService = psychologyService;
+            _httpClientFactory = httpClientFactory;
             _logger = logger;
         }        
 
@@ -31,7 +34,9 @@ namespace MppTests.Api.Controllers
             _logger.LogInformation($"{DateTime.Now.ToString()} analize test");
 
             try
-            {                             
+            {
+                _ = TrackVisitMppTestsAsync();
+
                 var analysis = await _psychologyService.AnalyzeColorPreferencesAsync(request);
                 return Ok(analysis);
             }
@@ -179,6 +184,54 @@ namespace MppTests.Api.Controllers
                     "Продолжайте развивать свои интеллектуальные способности и гибкость мышления."
                 }
             });
+        }
+
+        private async Task TrackVisitMppTestsAsync()
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+
+            var clientIp = GetRealClientIp(HttpContext);
+
+            // Создаем запрос к analytics
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                "http://analytics-api-container:8080/v1/analytics/track-mpptests");
+
+            request.Headers.Add("X-Forwarded-For", clientIp);
+            request.Headers.Add("X-Real-IP", clientIp);
+            request.Headers.Add("X-Operation-Type", "calc");
+
+            // Прокидываем оригинальный User-Agent
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            if (!string.IsNullOrEmpty(userAgent))
+            {
+                request.Headers.Add("User-Agent", userAgent);
+            }
+
+            var response = await httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
+            }
+        }
+
+        private string GetRealClientIp(HttpContext context)
+        {
+            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(forwardedFor))
+            {
+                // Берем первый IP из цепочки (реальный клиентский)
+                return forwardedFor.Split(',').First().Trim();
+            }
+
+            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(realIp))
+            {
+                return realIp;
+            }
+
+            // Если нет заголовков, используем RemoteIpAddress
+            return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         }
     }
 }
