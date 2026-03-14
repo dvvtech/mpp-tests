@@ -12,7 +12,7 @@
                 options.AddPolicy(AllowSpecificOriginPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("https://dvvtech.github.io")//"https://dvvtech.github.io/psycho-color-analysis"
+                        policy.WithOrigins("https://mpptests.com", "https://dvvtech.github.io")//"https://dvvtech.github.io/psycho-color-analysis"
                               //.AllowCredentials() // Разрешить куки
                               .AllowAnyHeader()
                               .AllowAnyMethod();
