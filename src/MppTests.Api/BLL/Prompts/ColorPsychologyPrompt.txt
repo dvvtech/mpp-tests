@@ -49,7 +49,7 @@
 
 ФОРМАТ ОТВЕТА (СТРОГО JSON, БЕЗ ЛИШНЕГО ТЕКСТА):
 {
-"main_characteristic": "...",
+"mainCharacteristic": "...",
 "strengths": ["...", "..."],
 "recommendations": ["...", "..."]
 }
