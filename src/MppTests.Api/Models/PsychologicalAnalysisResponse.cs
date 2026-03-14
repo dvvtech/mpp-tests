@@ -4,7 +4,7 @@ namespace MppTests.Api.Models
 {
     public class PsychologicalAnalysisResponse
     {
-        [JsonPropertyName("main_characteristic")]
+        [JsonPropertyName("mainCharacteristic")]
         public string MainCharacteristic { get; set; }
 
         [JsonPropertyName("strengths")]
