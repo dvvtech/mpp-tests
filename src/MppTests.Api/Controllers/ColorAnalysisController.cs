@@ -35,7 +35,7 @@ namespace MppTests.Api.Controllers
 
             try
             {
-                //_ = TrackVisitMppTestsAsync();
+                _ = TrackVisitMppTestsAsync();
 
                 var analysis = await _psychologyService.AnalyzeColorPreferencesAsync(request);
                 return Ok(analysis);
