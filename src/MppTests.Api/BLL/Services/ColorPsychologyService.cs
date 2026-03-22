@@ -137,10 +137,10 @@ namespace MppTests.Api.BLL.Services
                 return "Отсутствуют теплые и холодные цвета";
 
             if (warmSum > coldSum)
-                return $"Преобладает янская энергия ({warmSum:F2}% vs {coldSum:F2}%)";
+                return $"Преобладает янская энергия ({warmSum:F1}% vs {coldSum:F1}%)";
 
             if (coldSum > warmSum)
-                return $"Преобладает иньская энергия ({coldSum:F2}% vs {warmSum:F2}%)";
+                return $"Преобладает иньская энергия ({coldSum:F1}% vs {warmSum:F1}%)";
 
             if (Math.Abs(warmSum - coldSum) < 0.001)
                 return "Баланс энергий";
