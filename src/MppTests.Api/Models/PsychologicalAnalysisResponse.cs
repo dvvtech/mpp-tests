@@ -2,6 +2,18 @@
 
 namespace MppTests.Api.Models
 {
+    public class PsychologicalAnalysisDto
+    {
+        [JsonPropertyName("mainCharacteristic")]
+        public string MainCharacteristic { get; set; }
+
+        [JsonPropertyName("strengths")]
+        public List<string> Strengths { get; set; } = new();
+
+        [JsonPropertyName("recommendations")]
+        public List<string> Recommendations { get; set; } = new();        
+    }
+
     public class PsychologicalAnalysisResponse
     {
         [JsonPropertyName("mainCharacteristic")]
@@ -12,5 +24,8 @@ namespace MppTests.Api.Models
 
         [JsonPropertyName("recommendations")]
         public List<string> Recommendations { get; set; } = new();
+
+        [JsonPropertyName("dominantEnergy")]
+        public string DominantEnergy { get; set; }
     }
 }
