@@ -1,29 +1,39 @@
 services:
-  mpp_tests_api:
-    container_name: mpp-tests-api-container
-    build:
-      context: ..
-      dockerfile: src/MppTests.Api/Dockerfile
+  mpp_tests_api:        
+    image: ghcr.io/dvvtech/mpp-tests:latest      
     environment:
-      - ASPNETCORE_ENVIRONMENT=Prod
-      - AiClientConfig__OpenAiApiKey=${OPEN_AI_API_KEY}
-      - ProxySettings__Ip=${IP_KEY}
-      - ProxySettings__Port=${PORT_KEY}
-      - ProxySettings__Login=${LOGIN_KEY}
-      - ProxySettings__Password=${PASSWORD_KEY}
-      
-    restart: unless-stopped    
+      - ASPNETCORE_ENVIRONMENT=Prod      
     networks:
-      - public-network
-    labels:      
-      - "traefik.enable=true"      
-      - "traefik.http.routers.mpp-tests-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/mpp-tests`)"      
-      - "traefik.http.routers.mpp-tests-api.entrypoints=websecure"      
-      - "traefik.http.routers.mpp-tests-api.tls.certresolver=letsencrypt"     
-      - "traefik.http.services.mpp-tests-api.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.mpp-tests-stripprefix.stripprefix.prefixes=/mpp-tests"
-      - "traefik.http.routers.mpp-tests-api.middlewares=mpp-tests-stripprefix"
+      - public-network5
+    secrets:
+      - AiClientConfig__OpenAiApiKey
+      - ProxySettings__Ip      
+      - ProxySettings__Login
+      - ProxySettings__Password
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:      
+        - "traefik.enable=true"      
+        - "traefik.http.routers.mpp-tests-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/mpp-tests`)"      
+        - "traefik.http.routers.mpp-tests-api.entrypoints=websecure"      
+        - "traefik.http.routers.mpp-tests-api.tls.certresolver=letsencrypt"     
+        - "traefik.http.services.mpp-tests-api.loadbalancer.server.port=8080"
+        - "traefik.http.middlewares.mpp-tests-stripprefix.stripprefix.prefixes=/mpp-tests"
+        - "traefik.http.routers.mpp-tests-api.middlewares=mpp-tests-stripprefix"
 
 networks:
-  public-network:
+  public-network5:
+    external: true
+
+secrets:
+  AiClientConfig__OpenAiApiKey:
+    external: true  
+  ProxySettings__Port:
+    external: true
+  ProxySettings__Login:
+    external: true
+  ProxySettings__Password:
     external: true

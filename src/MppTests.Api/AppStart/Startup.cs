@@ -37,8 +37,22 @@ namespace MppTests.Api.AppStart
 
         private void InitConfigs()
         {
+            if (!_builder.Environment.IsDevelopment())
+            {
+                _builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+            }
+
             _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
-            _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));            
+            _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
+
+            var logger = _builder.Services.BuildServiceProvider().GetService<ILogger<Startup>>();
+            var smtpConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
+            logger.LogInformation("key:" + smtpConfig.OpenAiApiKey);            
+
+            var config = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
+            logger.LogInformation("s1:" + config.Login);
+            logger.LogInformation("s2:" + config.Ip);
+            logger.LogInformation("s3:" + config.Password);
         }
 
         private void ConfigureClientAPI()
