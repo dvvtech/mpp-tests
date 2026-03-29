@@ -31,7 +31,7 @@ networks:
 secrets:
   AiClientConfig__OpenAiApiKey:
     external: true  
-  ProxySettings__Port:
+  ProxySettings__Ip:
     external: true
   ProxySettings__Login:
     external: true
