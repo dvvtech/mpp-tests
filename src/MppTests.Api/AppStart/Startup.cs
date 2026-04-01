@@ -30,6 +30,7 @@ namespace MppTests.Api.AppStart
             _builder.Services.AddHttpClient();
 
             InitConfigs();
+            ConfigureServices();
             ConfigureClientAPI();
 
             _builder.Services.AddControllers();
@@ -55,11 +56,14 @@ namespace MppTests.Api.AppStart
             //logger.LogInformation("s3:" + config.Password);
         }
 
-        private void ConfigureClientAPI()
-        {            
+        private void ConfigureServices()
+        {
             _builder.Services.AddScoped<IPromptService, PromptService>();
             _builder.Services.AddScoped<IColorPsychologyService, ColorPsychologyService>();
+        }
 
+        private void ConfigureClientAPI()
+        {                        
             _builder.Services.AddHttpClient<IAiClient, ChatGptAiClient>((serviceProvider, client) =>
             {
                 var aiClientConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
