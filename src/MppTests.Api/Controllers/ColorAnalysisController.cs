@@ -16,8 +16,7 @@ namespace MppTests.Api.Controllers
     {
         private readonly IColorPsychologyService _psychologyService;
         private readonly IAnalyticsTrackingService _analyticsTrackingService;
-        private readonly ILogger<ColorAnalysisController> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<ColorAnalysisController> _logger;        
 
         public ColorAnalysisController(
             IColorPsychologyService psychologyService,
@@ -26,8 +25,7 @@ namespace MppTests.Api.Controllers
             ILogger<ColorAnalysisController> logger)
         {
             _psychologyService = psychologyService;
-            _analyticsTrackingService = analyticsTrackingService;
-            _httpClientFactory = httpClientFactory;
+            _analyticsTrackingService = analyticsTrackingService;            
             _logger = logger;
         }        
 
