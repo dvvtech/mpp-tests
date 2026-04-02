@@ -23,9 +23,7 @@ else
     app.ApplyCors();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 

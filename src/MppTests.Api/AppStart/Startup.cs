@@ -3,6 +3,7 @@ using MppTests.Api.BLL.Abstract;
 using MppTests.Api.BLL.Services;
 using MppTests.Api.Configuration;
 using System.Net;
+using System.Threading.RateLimiting;
 
 namespace MppTests.Api.AppStart
 {
@@ -32,6 +33,7 @@ namespace MppTests.Api.AppStart
             InitConfigs();
             ConfigureServices();
             ConfigureClientAPI();
+            ConfigureRateLimiting();
 
             _builder.Services.AddControllers();
         }
@@ -48,12 +50,7 @@ namespace MppTests.Api.AppStart
 
             //var logger = _builder.Services.BuildServiceProvider().GetService<ILogger<Startup>>();
             //var smtpConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
-            //logger.LogInformation("key:" + smtpConfig.OpenAiApiKey);            
-
-            //var config = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
-            //logger.LogInformation("s1:" + config.Login);
-            //logger.LogInformation("s2:" + config.Ip);
-            //logger.LogInformation("s3:" + config.Password);
+            //logger.LogInformation("key:" + smtpConfig.OpenAiApiKey);                        
         }
 
         private void ConfigureServices()
@@ -61,6 +58,39 @@ namespace MppTests.Api.AppStart
             _builder.Services.AddScoped<IAnalyticsTrackingService, AnalyticsTrackingService>();
             _builder.Services.AddScoped<IPromptService, PromptService>();
             _builder.Services.AddScoped<IColorPsychologyService, ColorPsychologyService>();
+        }
+
+        private void ConfigureRateLimiting()
+        {
+            _builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.OnRejected = async (context, cancellationToken) =>
+                {
+                    context.HttpContext.Response.ContentType = "application/json";
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(new
+                    {
+                        Success = false,
+                        ErrorMessage = "Превышено количество запросов. Попробуйте позже."
+                    }, cancellationToken);
+                };
+
+                options.AddPolicy("MppRequests", httpContext =>
+                {
+                    var clientIp = httpContext.GetRealClientIp();
+
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: clientIp,
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            AutoReplenishment = true
+                        });
+                });
+            });
         }
 
         private void ConfigureClientAPI()

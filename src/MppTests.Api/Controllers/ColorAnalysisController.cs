@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MppTests.Api.AppStart.Extensions;
 using MppTests.Api.BLL.Abstract;
 using MppTests.Api.BLL.Exceptions;
@@ -31,6 +32,7 @@ namespace MppTests.Api.Controllers
         }        
 
         [HttpPost("analyze-lusher")]
+        [EnableRateLimiting("MppRequests")]
         public async Task<ActionResult<PsychologicalAnalysisResponse>> AnalyzeByLusherMethod(
             [FromBody] ApiRequest request,
             CancellationToken cancellationToken = default)
