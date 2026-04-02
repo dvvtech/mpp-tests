@@ -58,6 +58,7 @@ namespace MppTests.Api.AppStart
 
         private void ConfigureServices()
         {
+            _builder.Services.AddScoped<IAnalyticsTrackingService, AnalyticsTrackingService>();
             _builder.Services.AddScoped<IPromptService, PromptService>();
             _builder.Services.AddScoped<IColorPsychologyService, ColorPsychologyService>();
         }

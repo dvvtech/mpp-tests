@@ -14,15 +14,18 @@ namespace MppTests.Api.Controllers
     public class ColorAnalysisController : ControllerBase
     {
         private readonly IColorPsychologyService _psychologyService;
+        private readonly IAnalyticsTrackingService _analyticsTrackingService;
         private readonly ILogger<ColorAnalysisController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
 
         public ColorAnalysisController(
             IColorPsychologyService psychologyService,
+            IAnalyticsTrackingService analyticsTrackingService,
             IHttpClientFactory httpClientFactory,
             ILogger<ColorAnalysisController> logger)
         {
             _psychologyService = psychologyService;
+            _analyticsTrackingService = analyticsTrackingService;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }        
@@ -36,7 +39,10 @@ namespace MppTests.Api.Controllers
 
             try
             {
-                _ = TrackVisitMppTestsAsync();
+                var clientIp = HttpContext.GetRealClientIp();
+                var userAgent = Request.Headers["User-Agent"].ToString();
+
+                _ = _analyticsTrackingService.TrackVisitAsync("calc", clientIp, userAgent, cancellationToken);
 
                 var analysis = await _psychologyService.AnalyzeColorPreferencesAsync(request);
                 return Ok(analysis);
@@ -187,35 +193,6 @@ namespace MppTests.Api.Controllers
                     "Продолжайте развивать свои интеллектуальные способности и гибкость мышления."
                 }
             });
-        }
-
-        private async Task TrackVisitMppTestsAsync()
-        {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            var clientIp = HttpContext.GetRealClientIp();
-
-            // Создаем запрос к analytics
-            var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                "http://analytics_api:8080/v1/analytics/track-mpptests");
-
-            request.Headers.Add("X-Forwarded-For", clientIp);
-            request.Headers.Add("X-Real-IP", clientIp);
-            request.Headers.Add("X-Operation-Type", "calc");
-
-            // Прокидываем оригинальный User-Agent
-            var userAgent = Request.Headers["User-Agent"].ToString();
-            if (!string.IsNullOrEmpty(userAgent))
-            {
-                request.Headers.Add("User-Agent", userAgent);
-            }
-
-            var response = await httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
-            }
         }
     }
 }
