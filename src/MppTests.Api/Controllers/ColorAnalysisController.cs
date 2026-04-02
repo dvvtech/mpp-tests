@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using MppTests.Api.AppStart.Extensions;
 using MppTests.Api.BLL.Abstract;
 using MppTests.Api.BLL.Exceptions;
 using MppTests.Api.Models;
@@ -192,7 +193,7 @@ namespace MppTests.Api.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
 
-            var clientIp = GetRealClientIp(HttpContext);
+            var clientIp = HttpContext.GetRealClientIp();
 
             // Создаем запрос к analytics
             var request = new HttpRequestMessage(
@@ -215,25 +216,6 @@ namespace MppTests.Api.Controllers
             {
                 _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
             }
-        }
-
-        private string GetRealClientIp(HttpContext context)
-        {
-            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(forwardedFor))
-            {
-                // Берем первый IP из цепочки (реальный клиентский)
-                return forwardedFor.Split(',').First().Trim();
-            }
-
-            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(realIp))
-            {
-                return realIp;
-            }
-
-            // Если нет заголовков, используем RemoteIpAddress
-            return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         }
     }
 }
