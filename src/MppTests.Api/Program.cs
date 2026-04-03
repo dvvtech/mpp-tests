@@ -1,6 +1,5 @@
 using MppTests.Api.AppStart;
 using MppTests.Api.AppStart.Extensions;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +23,6 @@ else
 }
 
 app.UseRateLimiter();
-
 app.MapControllers();
 
 app.Run();
