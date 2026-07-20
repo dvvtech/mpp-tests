@@ -108,7 +108,7 @@ namespace MppTests.Api.AppStart
                     var handler = new HttpClientHandler();
 
                     // Получаем настройки прокси из конфигурации
-                    var proxyConfig = _builder.Configuration.GetSection("ProxySettings").Get<ProxyConfig>();
+                    var proxyConfig = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
 
                     var proxy = new WebProxy
                     {
