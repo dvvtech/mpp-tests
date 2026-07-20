@@ -94,7 +94,7 @@ namespace MppTests.Api.AppStart
         }
 
         private void ConfigureClientAPI()
-        {                        
+        {
             _builder.Services.AddHttpClient<IAiClient, ChatGptAiClient>((serviceProvider, client) =>
             {
                 var aiClientConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
@@ -110,24 +110,22 @@ namespace MppTests.Api.AppStart
                     // Получаем настройки прокси из конфигурации
                     var proxyConfig = _builder.Configuration.GetSection("ProxySettings").Get<ProxyConfig>();
 
-                    if (proxyConfig?.Enabled == true && !string.IsNullOrEmpty(proxyConfig.Ip))
+                    var proxy = new WebProxy
                     {
-                        var proxy = new WebProxy
-                        {
-                            Address = new Uri($"http://{proxyConfig.Ip}:{proxyConfig.Port}"),
-                            BypassProxyOnLocal = false,
-                            UseDefaultCredentials = false
-                        };
+                        Address = new Uri(proxyConfig.Url),
+                        BypassProxyOnLocal = false,
+                        UseDefaultCredentials = false
+                    };
 
-                        // Если есть логин и пароль
-                        if (!string.IsNullOrEmpty(proxyConfig.Login) && !string.IsNullOrEmpty(proxyConfig.Password))
-                        {
-                            proxy.Credentials = new NetworkCredential(proxyConfig.Login, proxyConfig.Password);
-                        }
-
-                        handler.Proxy = proxy;
-                        handler.UseProxy = true;
+                    // Если есть логин и пароль
+                    if (!string.IsNullOrEmpty(proxyConfig.Login) && !string.IsNullOrEmpty(proxyConfig.Password))
+                    {
+                        proxy.Credentials = new NetworkCredential(proxyConfig.Login, proxyConfig.Password);
                     }
+
+                    handler.Proxy = proxy;
+                    handler.UseProxy = true;
+
                     return handler;
                 });
         }
