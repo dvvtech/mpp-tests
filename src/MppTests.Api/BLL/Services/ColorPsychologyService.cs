@@ -24,16 +24,15 @@ namespace MppTests.Api.BLL.Services
 
         private readonly ILogger<ColorPsychologyService> _logger;
 
-        public ColorPsychologyService(ILogger<ColorPsychologyService> logger)
+        public ColorPsychologyService(
+            IAiClient aiClient,
+            IPromptService promptService,
+            ILogger<ColorPsychologyService> logger)
         {
+            _aiClient = aiClient;
+            _promptService = promptService;
             _logger = logger;
         }
-
-        //public ColorPsychologyService(IAiClient aiClient, IPromptService promptService)
-        //{
-        //    _aiClient = aiClient;
-        //    _promptService = promptService;
-        //}
 
         public async Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(
             ApiRequest request,
