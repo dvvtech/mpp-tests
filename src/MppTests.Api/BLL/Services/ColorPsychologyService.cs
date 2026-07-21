@@ -29,11 +29,11 @@ namespace MppTests.Api.BLL.Services
             _logger = logger;
         }
 
-        public ColorPsychologyService(IAiClient aiClient, IPromptService promptService)
-        {
-            _aiClient = aiClient;
-            _promptService = promptService;
-        }
+        //public ColorPsychologyService(IAiClient aiClient, IPromptService promptService)
+        //{
+        //    _aiClient = aiClient;
+        //    _promptService = promptService;
+        //}
 
         public async Task<PsychologicalAnalysisResponse> AnalyzeColorPreferencesAsync(
             ApiRequest request,
