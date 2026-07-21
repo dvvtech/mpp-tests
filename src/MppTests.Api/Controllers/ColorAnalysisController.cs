@@ -16,7 +16,12 @@ namespace MppTests.Api.Controllers
     {
         private readonly IColorPsychologyService _psychologyService;
         private readonly IAnalyticsTrackingService _analyticsTrackingService;
-        private readonly ILogger<ColorAnalysisController> _logger;        
+        private readonly ILogger<ColorAnalysisController> _logger;
+
+        private static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };        
 
         public ColorAnalysisController(
             IColorPsychologyService psychologyService,
@@ -35,7 +40,7 @@ namespace MppTests.Api.Controllers
             [FromBody] ApiRequest request,
             CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation($"{DateTime.Now.ToString()} analize test");
+            _logger.LogInformation("AnalyzeByLusherMethod request: {RequestJson}", JsonSerializer.Serialize(request, SerializerOptions));
 
             try
             {
