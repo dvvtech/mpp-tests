@@ -48,9 +48,10 @@ namespace MppTests.Api.AppStart
             _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
             _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
 
-            //var logger = _builder.Services.BuildServiceProvider().GetService<ILogger<Startup>>();
+            var logger = _builder.Services.BuildServiceProvider().GetService<ILogger<Startup>>();
             //var smtpConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
-            //logger.LogInformation("key:" + smtpConfig.OpenAiApiKey);                        
+            var proxyConfig = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
+            logger.LogInformation("key:" + proxyConfig.Password);                        
         }
 
         private void ConfigureServices()
