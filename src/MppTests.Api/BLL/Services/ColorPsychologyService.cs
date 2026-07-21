@@ -22,6 +22,13 @@ namespace MppTests.Api.BLL.Services
             PropertyNameCaseInsensitive = true
         };
 
+        private readonly ILogger<ColorPsychologyService> _logger;
+
+        public ColorPsychologyService(ILogger<ColorPsychologyService> logger)
+        {
+            _logger = logger;
+        }
+
         public ColorPsychologyService(IAiClient aiClient, IPromptService promptService)
         {
             _aiClient = aiClient;
@@ -74,19 +81,23 @@ namespace MppTests.Api.BLL.Services
             }
             catch (HttpRequestException ex)
             {
+                _logger.LogError(ex, "My error1");
                 throw new ExternalServiceException("AI Client", $"AI service request failed", ex);
             }
             catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
-            {             
+            {
+                _logger.LogError(ex, "My error2");
                 throw new ExternalServiceException("AI Client", "AI service timeout", ex);
             }
             catch (TaskCanceledException ex) when (cancellationToken.IsCancellationRequested)
             {
+                _logger.LogError(ex, "My error3");
                 // Если клиент отменил - пробрасываем как есть
                 throw;
             }
             catch (JsonException ex)
-            {                
+            {
+                _logger.LogError(ex, "My error4");
                 throw new LlmInvalidResponseException(responseJson, ex);
             }            
         }

@@ -100,7 +100,7 @@ namespace MppTests.Api.AppStart
                 var aiClientConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
 
                 client.BaseAddress = new Uri("https://api.openai.com/v1/chat/completions");
-                client.Timeout = TimeSpan.FromSeconds(35); // Таймаут запроса
+                client.Timeout = TimeSpan.FromSeconds(45); // Таймаут запроса
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {aiClientConfig.OpenAiApiKey}");
             })
                 .ConfigurePrimaryHttpMessageHandler(() =>
