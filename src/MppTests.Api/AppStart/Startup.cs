@@ -48,12 +48,9 @@ namespace MppTests.Api.AppStart
             _builder.Services.Configure<AiClientConfig>(_builder.Configuration.GetSection(AiClientConfig.SectionName));
             _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
 
-            var logger = _builder.Services.BuildServiceProvider().GetService<ILogger<Startup>>();
+            //var logger = _builder.Services.BuildServiceProvider().GetService<ILogger<Startup>>();
             //var smtpConfig = _builder.Configuration.GetSection(AiClientConfig.SectionName).Get<AiClientConfig>();
-            var proxyConfig = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
-            logger.LogInformation("key:" + proxyConfig.Url);
-            logger.LogInformation("key:" + proxyConfig.Login);
-            logger.LogInformation("key:" + proxyConfig.Password);
+            //var proxyConfig = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();            
         }
 
         private void ConfigureServices()
@@ -110,13 +107,19 @@ namespace MppTests.Api.AppStart
                 {
                     var handler = new HttpClientHandler();
 
+                    var logger = _builder.Services.BuildServiceProvider().GetService<ILogger<Startup>>();
+
                     // Получаем настройки прокси из конфигурации
                     var proxyConfig = _builder.Configuration.GetSection(ProxyConfig.SectionName).Get<ProxyConfig>();
+
+                    logger.LogInformation("key1:" + proxyConfig.Url);
+                    logger.LogInformation("key2:" + proxyConfig.Login);
+                    logger.LogInformation("key3:" + proxyConfig.Password);
 
                     var proxy = new WebProxy
                     {
                         Address = new Uri(proxyConfig.Url),
-                        BypassProxyOnLocal = false,
+                        //BypassProxyOnLocal = false,
                         UseDefaultCredentials = false
                     };
 
