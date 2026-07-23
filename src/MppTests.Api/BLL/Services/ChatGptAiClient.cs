@@ -12,7 +12,7 @@ namespace MppTests.Api.BLL.Services
         private readonly string _apiUrl;
 
         public ChatGptAiClient(HttpClient httpClient,
-                               string model = "gpt-4o")
+                               string model = "gpt-4o-mini")
         {
             _httpClient = httpClient;
             //_apiKey = apiKey;
