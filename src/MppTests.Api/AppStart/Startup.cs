@@ -119,7 +119,7 @@ namespace MppTests.Api.AppStart
                     var proxy = new WebProxy
                     {
                         Address = new Uri(proxyConfig.Url),
-                        //BypassProxyOnLocal = false,
+                        //BypassProxyOnLocal = false,//
                         UseDefaultCredentials = false
                     };
 
