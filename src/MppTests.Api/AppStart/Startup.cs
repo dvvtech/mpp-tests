@@ -114,7 +114,7 @@ namespace MppTests.Api.AppStart
 
                     logger.LogInformation("key1:" + proxyConfig.Url);
                     logger.LogInformation("key2:" + proxyConfig.Login);
-                    logger.LogInformation("key3:" + proxyConfig.Password);
+                    logger.LogInformation("key3:" + proxyConfig.Password2);
 
                     var proxy = new WebProxy
                     {
@@ -124,9 +124,9 @@ namespace MppTests.Api.AppStart
                     };
 
                     // Если есть логин и пароль
-                    if (!string.IsNullOrEmpty(proxyConfig.Login) && !string.IsNullOrEmpty(proxyConfig.Password))
+                    if (!string.IsNullOrEmpty(proxyConfig.Login) && !string.IsNullOrEmpty(proxyConfig.Password2))
                     {
-                        proxy.Credentials = new NetworkCredential(proxyConfig.Login, proxyConfig.Password);
+                        proxy.Credentials = new NetworkCredential(proxyConfig.Login, proxyConfig.Password2);
                     }
 
                     handler.Proxy = proxy;

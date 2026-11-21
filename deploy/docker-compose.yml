@@ -7,7 +7,7 @@ services:
       - public-network5
     secrets:
       - AiClientConfig__OpenAiApiKey
-      - ProxyConfig__Password      
+      - ProxyConfig__Password2      
     deploy:
       mode: replicated
       replicas: 1
@@ -29,5 +29,5 @@ networks:
 secrets:
   AiClientConfig__OpenAiApiKey:
     external: true  
-  ProxyConfig__Password:
+  ProxyConfig__Password2:
     external: true  
